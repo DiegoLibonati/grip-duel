@@ -6,15 +6,6 @@ This project was created primarily for **educational and learning purposes**.
 While it is well-structured and could technically be used in production, it is **not intended for commercialization**.  
 The main goal is to explore and demonstrate best practices, patterns, and technologies in software development.
 
-## Getting Started
-
-1. Clone the repository
-2. Navigate to the project folder
-3. Execute: `npm install`
-4. Execute: `npm run dev`
-
-The application will open automatically at `http://localhost:3000`
-
 ## Description
 
 **Grip Duel** is a browser-based Rock Paper Scissors game where a single player competes against an AI opponent in real time. The game is built as a vanilla TypeScript SPA with no runtime dependencies, making it lightweight and fast to load.
@@ -33,6 +24,8 @@ The UI is fully accessible: all interactive elements have ARIA roles, labels, an
 4. Vite
 
 ## Libraries used
+
+The project ships with zero runtime dependencies — everything below is tooling used only during development, testing, and building.
 
 #### Dependencies
 
@@ -64,31 +57,66 @@ No production dependencies - Pure Vanilla TypeScript
 "vite": "^7.1.6"
 ```
 
-## Portfolio Link
+## Getting Started
 
-[`https://www.diegolibonati.com.ar/#/project/grip-duel`](https://www.diegolibonati.com.ar/#/project/grip-duel)
+To run the application locally:
+
+1. Clone the repository
+2. Navigate to the project folder
+3. Execute: `npm install`
+4. Execute: `npm run dev`
+
+The application will open automatically at `http://localhost:3000`.
+
+### Pre-Commit for Development
+
+Husky + lint-staged are configured to keep the codebase consistent on every commit. Staged `*.{ts,js}` files are auto-fixed with ESLint and formatted with Prettier; `*.{json,css,md,html}` files are formatted with Prettier. The hook is installed automatically by the `prepare` script when you run `npm install`.
+
+You can also run the underlying tools manually:
+
+```bash
+npm run lint          # ESLint check
+npm run lint:fix      # ESLint auto-fix
+npm run format        # Prettier format
+npm run format:check  # Prettier check (no writes)
+npm run type-check    # TypeScript type checking only
+```
 
 ## Testing
+
+Tests are written with Jest, ts-jest and `@testing-library/dom` running on jsdom.
 
 1. Navigate to the project folder
 2. Execute: `npm test`
 
-For coverage report:
+For watch mode and the coverage report:
 
 ```bash
-npm run test:coverage
+npm run test:watch     # Watch mode
+npm run test:coverage  # Generate coverage report
 ```
 
-## Security
+## Security Audit
 
-### npm audit
-
-Check for vulnerabilities in dependencies:
+Once tests pass, audit the dependency tree for known vulnerabilities before building:
 
 ```bash
 npm audit
 ```
 
+## Build
+
+When the codebase is clean and audited, generate the production bundle:
+
+```bash
+npm run build      # tsc + vite build → outputs to dist/
+npm run preview    # Serve the built bundle locally to verify
+```
+
 ## Known Issues
 
 None at the moment.
+
+## Portfolio Link
+
+[`https://www.diegolibonati.com.ar/#/project/grip-duel`](https://www.diegolibonati.com.ar/#/project/grip-duel)
