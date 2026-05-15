@@ -97,6 +97,16 @@ describe("Choice", () => {
       await user.click(screen.getByRole("button", { name: "Choose rock" }));
       expect(mockOnClick).toHaveBeenCalledWith(expect.any(MouseEvent));
     });
+
+    it("should call onClick for each click when clicked multiple times", async () => {
+      const user = userEvent.setup();
+      renderComponent();
+      const button = screen.getByRole("button", { name: "Choose rock" });
+      await user.click(button);
+      await user.click(button);
+      await user.click(button);
+      expect(mockOnClick).toHaveBeenCalledTimes(3);
+    });
   });
 
   describe("cleanup", () => {

@@ -7,7 +7,7 @@ import { iaChoices } from "@/constants/vars";
 
 import { getResult } from "@/helpers/getResult";
 
-import assets from "@/assets/export";
+import assets from "@/assets/index";
 
 import "@/pages/GripDuelPage/GripDuelPage.css";
 

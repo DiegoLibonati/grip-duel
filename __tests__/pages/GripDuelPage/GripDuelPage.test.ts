@@ -71,6 +71,13 @@ describe("GripDuelPage", () => {
         screen.getByRole("button", { name: "Choose scissor" })
       ).toBeInTheDocument();
     });
+
+    it("should set aria-label to Grip Duel on the main element", () => {
+      renderPage();
+      expect(
+        screen.getByRole("main", { name: "Grip Duel" })
+      ).toBeInTheDocument();
+    });
   });
 
   describe("game behavior", () => {
@@ -177,6 +184,16 @@ describe("GripDuelPage", () => {
         });
       });
 
+      it("should clear the description text", async () => {
+        const user = userEvent.setup();
+        jest.spyOn(Math, "random").mockReturnValue(0.7);
+        renderPage();
+        await user.click(screen.getByRole("button", { name: "Choose rock" }));
+        expect(
+          screen.queryByText("Make your choice now!")
+        ).not.toBeInTheDocument();
+      });
+
       it("should accumulate score across multiple rounds", async () => {
         const user = userEvent.setup();
         jest.spyOn(Math, "random").mockReturnValue(0.7);
@@ -263,6 +280,27 @@ describe("GripDuelPage", () => {
       element.cleanup?.();
       await user.click(screen.getByRole("button", { name: "Choose rock" }));
       expect(screen.getByText("Choose an option")).toBeInTheDocument();
+    });
+
+    describe("when a reset timer is pending", () => {
+      beforeEach(() => {
+        jest.useFakeTimers();
+      });
+
+      afterEach(() => {
+        jest.useRealTimers();
+      });
+
+      it("should cancel the pending reset timer", async () => {
+        const user = userEvent.setup({ delay: null });
+        jest.spyOn(Math, "random").mockReturnValue(0);
+        const element = renderPage();
+        await user.click(screen.getByRole("button", { name: "Choose rock" }));
+        element.cleanup?.();
+        jest.advanceTimersByTime(2500);
+        await Promise.resolve();
+        expect(screen.getByText(/Draw!/)).toBeInTheDocument();
+      });
     });
   });
 });

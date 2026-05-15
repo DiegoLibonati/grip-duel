@@ -113,6 +113,14 @@ npm run build      # tsc + vite build → outputs to dist/
 npm run preview    # Serve the built bundle locally to verify
 ```
 
+## Continuous Integration
+
+A GitHub Actions pipeline runs automatically on every push and pull request targeting `main`. The pipeline has three sequential jobs:
+
+1. **Lint & Audit** — runs `npm run lint` and `npm run type-check`
+2. **Testing** — runs `npm test` (requires Lint & Audit to pass)
+3. **Build** — runs `npm run build` (requires Testing to pass)
+
 ## Known Issues
 
 None at the moment.
