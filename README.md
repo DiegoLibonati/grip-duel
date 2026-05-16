@@ -96,6 +96,57 @@ npm run test:watch     # Watch mode
 npm run test:coverage  # Generate coverage report
 ```
 
+## Continuous Integration
+
+The repository ships with a **GitHub Actions** pipeline defined in [`.github/workflows/ci.yml`](.github/workflows/ci.yml). It runs automatically on every `push` and `pull_request` targeting the `main` branch.
+
+### Pipeline overview
+
+```
+                      ┌─── PR or push to main ───┐
+                      ▼                          ▼
+┌──────────────────────┐  ┌──────────────────┐  ┌──────────────────┐
+│   lint-and-audit     │─▶│     testing      │─▶│      build       │
+│  eslint · tsc check  │  │   jest (jsdom)   │  │  tsc + vite build│
+└──────────────────────┘  └──────────────────┘  └──────────────────┘
+```
+
+All three jobs run on `ubuntu-latest`, install Node using the version pinned in [`.nvmrc`](.nvmrc), and reuse the npm cache via `actions/setup-node`. Each job runs `npm ci` before its specific commands.
+
+### Validation jobs (run on every PR and push)
+
+1. **`lint-and-audit`** — runs `npm run lint` (ESLint with the TypeScript ruleset) and `npm run type-check` (`tsc --noEmit`). This is the entry point of the pipeline; the next jobs only run if it succeeds.
+2. **`testing`** — runs `npm test`, which executes the full Jest suite on `jsdom` with `ts-jest`, `@testing-library/dom` and `@testing-library/user-event`. Requires `lint-and-audit` to pass.
+3. **`build`** — runs `npm run build` (`tsc` followed by `vite build`) as a smoke test that the production bundle compiles cleanly. Requires `testing` to pass.
+
+### Running the same checks locally
+
+You can reproduce the entire pipeline locally with the same commands the CI runs:
+
+```bash
+# lint-and-audit
+npm run lint
+npm run type-check
+
+# testing
+npm test
+
+# build
+npm run build
+```
+
+For a stricter, fresh-install reproduction (closer to what the runner does), use `npm ci` instead of `npm install` to install dependencies exactly as locked in `package-lock.json`.
+
+### Where the build outputs live
+
+| Output                                           | Location                                                              |
+| ------------------------------------------------ | --------------------------------------------------------------------- |
+| Validation logs (lint, type-check, tests, build) | **Actions** tab on GitHub                                             |
+| Production bundle                                | Ephemeral, inside the runner (`dist/` is not uploaded as an artifact) |
+| Coverage report                                  | Generated locally via `npm run test:coverage` (not produced in CI)    |
+
+> **Note:** The current pipeline is validation-only — there are no release, tagging, or deployment jobs configured. Bumping versions, publishing to a registry, or deploying the bundle are manual steps.
+
 ## Security Audit
 
 Once tests pass, audit the dependency tree for known vulnerabilities before building:
@@ -112,14 +163,6 @@ When the codebase is clean and audited, generate the production bundle:
 npm run build      # tsc + vite build → outputs to dist/
 npm run preview    # Serve the built bundle locally to verify
 ```
-
-## Continuous Integration
-
-A GitHub Actions pipeline runs automatically on every push and pull request targeting `main`. The pipeline has three sequential jobs:
-
-1. **Lint & Audit** — runs `npm run lint` and `npm run type-check`
-2. **Testing** — runs `npm test` (requires Lint & Audit to pass)
-3. **Build** — runs `npm run build` (requires Testing to pass)
 
 ## Known Issues
 
